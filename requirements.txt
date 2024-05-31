@@ -1,0 +1,9 @@
+async-timeout==4.0.2
+beautifulsoup4==4.12.3
+Brotli==1.1.0
+bs4==0.0.2
+discord==2.2.2
+discord.py==2.2.2
+g4f==0.3.1.0
+nest-asyncio==1.6.0
+requests==2.31.0
