@@ -70,19 +70,7 @@ class Wallet:
 				return i;
 		else:
 			summa = abs(summa)
-			if self.balance > summa:
-				self.balance -= summa;
-				who.balance += summa;
-				self.update();
-				who.update();
-				return summa;
-			else:
-				i = self.balance
-				self.balance = 0;
-				who.balance += i;
-				self.update();
-				who.update();
-				return i;
+			who.thansfer(self,summa)
 
 async def mes_reward(ctx):
 	W = Wallet(ctx.author.id);
@@ -170,7 +158,7 @@ async def top(ctx):
 	my_dict = {}
 	for member in guild.members:
 		W = Wallet(member.id)
-		if not (W.check_balance() == 1 and W.check_bank() == 100):
+		if not (W.check_balance() == 1 and W.check_bank() == 100) and not (member.id == 800598406149701634):
 			value = W.check_balance() + W.check_bank();
 			user = member;
 			my_dict[user] = value;

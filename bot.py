@@ -25,28 +25,30 @@ import random
 nest_asyncio.apply() # в душе не ебу что за хуйня можно попробовать снести
 
 #база
+#dkkd
 print ("bot starting...")
 
 
 @bot.event
 async def on_message(ctx):
-    #тригер на упоминания
-    if ((ctx.content).find("<@800598406149701634>")!= -1):
-        await on_mention(ctx)
+    if not ctx.author.bot:
+        #тригер на упоминания
+        if ((ctx.content).find("<@800598406149701634>")!= -1):
+            await on_mention(ctx)
 
-    #тригер глобального чата 
-    try:
-        serv = ctx.guild.id;
-    except:
-        serv = -1;
-    need_channel = save_load.read("globalchat",serv,None)
-    if (need_channel != None):
-        need_channel = bot.get_channel(need_channel)
-        if (ctx.channel.id == need_channel.id):
-            await gb_triger(ctx);
-    if random.randint(0,50) == 0:
-        await ctx.add_reaction("🧱")
-        await bank.mes_reward(ctx);
+        #тригер глобального чата 
+        try:
+            serv = ctx.guild.id;
+        except:
+            serv = -1;
+        need_channel = save_load.read("globalchat",serv,None)
+        if (need_channel != None):
+            need_channel = bot.get_channel(need_channel)
+            if (ctx.channel.id == need_channel.id):
+                await gb_triger(ctx);
+        if random.randint(0,50) == 0:
+            await ctx.add_reaction("🧱")
+            await bank.mes_reward(ctx);
     await bot.process_commands(ctx)
 
 @bot.event
