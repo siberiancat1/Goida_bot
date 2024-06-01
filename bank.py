@@ -15,6 +15,7 @@ class Num:
 		self.dmg = 102
 		self.df = 103
 		self.factory = 104
+		self.armor = 105
 NUM = Num()
 
 
@@ -27,6 +28,7 @@ class Wallet:
 		self.dmg = int(save_load.read(_id,"dmg", 0))
 		self.df = int(save_load.read(_id,"df", 0))
 		self.factory = int(save_load.read(_id,"factory", 0))
+		self.armor = int(save_load.read(_id,"armor", 0))
 		print(self._id," $:",self.balance,"B:",self.bank)
 	def __str__(self):
 		return f'🧱Баланс: **{self.balance}**🧱 \n🏦Банк: **{self.bank}**🧱 \n🏭Заводов **{self.factory}** штук'
@@ -43,6 +45,8 @@ class Wallet:
 			return self.df;
 		elif what == NUM.factory:
 			return self.factory;
+		elif what == NUM.armor:
+			return self.armor;
 		else:
 			return self._id;
 	def set(self,what:int,value:int):
@@ -58,6 +62,8 @@ class Wallet:
 			self.df += value;
 		elif what == NUM.factory:
 			self.factory += value;
+		elif what == NUM.armor:
+			self.armor += value;
 		self.update()
 	def check_balance(self)->int:
 		print(self.balance)
@@ -76,6 +82,7 @@ class Wallet:
 		save_load.write(self._id,"dmg",self.dmg);
 		save_load.write(self._id,"df",self.df);
 		save_load.write(self._id,"factory",self.factory);
+		save_load.write(self._id,"armor",self.armor);
 	def banking(self,summa:int)->int:
 		#снимает сумму с баланса и кидает ее в банк
 		if summa>0:
@@ -122,7 +129,12 @@ class Wallet:
 		else:
 			summa = abs(summa)
 			who.transfer(self,summa)
-
+	def is_armor(self)->bool:
+		if self.get(NUM.armor)> 0:
+			self.set(NUM.armor,-1)
+			return True
+		else:
+			return False
 
 async def mes_reward(ctx):
 	W = Wallet(ctx.author.id);
@@ -139,6 +151,7 @@ async def daily(ctx):
 	W = Wallet(ctx.author.id)
 	summa = random.randint(25,250);
 	W.give(summa);
+	mes = ""
 	mes += ("вы получили " + str(summa) + "🧱 от кирпичного бога")
 	Zavod = W.get(NUM.factory)
 	if Zavod > 0:
@@ -147,7 +160,7 @@ async def daily(ctx):
 			summa += random.randint(50,75)*Zavod
 		mes += f"\nвы получили {summa}🧱 с {Zavod} заводов"
 		W.give(summa)
-	ctx.reply(mes)
+	await ctx.reply(mes)
 	
 
 @bot.command(name = "перевод",aliases=["СБП","cбп","СПБ","спб"])
@@ -179,20 +192,58 @@ async def trans(ctx,member,summa = 1,*,reason = ''):
 		print(ER)
 
 @bot.command(name = "купить",aliases=["покупка","магазин"])
-async def shop(ctx,who = None,value = 1):
-	mes = "на данный момент можно купить только завод за 500🧱\n пропишите ?купить завод"
-	if who == None:
-		ctx.reply("!на данный момент можно купить только завод за 500🧱\n пропишите ?купить завод")
-	elif who == "завод" or who == "з" or who == "кирпичный завод":
+async def shop(ctx,who = "",value = 1):
+	class product:
+		def __init__(self,what) -> None:
+			self._id = what
+			if what == NUM.factory:
+				self.price = 750
+				self.name = "Завод"
+				self.disc = "Позволяет получать ежедневную награду, можно купить неограниченное количество"
+				self.aliases = ["завод","кирпичный","з",1]
+			elif what == NUM.armor:
+				self.price = 100
+				self.name = "Умиротворятель"
+				self.disc = "Одноразовый. Защищает от резни."
+				self.aliases = ["умиротворятель","защита","броня","у",2]
+			else:
+				self.price = 9999999;
+				self.aliases = [];
+				self.name = ""
+				self.disc = "если вы читаете это что-то работает неправильно"
+
+		def alias(self,req)->bool:
+			if req in self.aliases or req == self.name:
+				return True;
+			else:
+				return False;
+
+	mes = "ошибка"
+	if who == "":
+		#список товаров
+		embed = discord.Embed(title="Магазин") #,color=Hex code
+		for i in range(104,105+1):
+			num = i - 103
+			prod = product(i)
+			embed.add_field(name=f"№{num}. {prod.name} {prod.price} 🧱", value=prod.disc, inline=False)
+		await ctx.reply(embed=embed)
+	else:
+		#собственно покупка
 		W = Wallet(ctx.author.id)
-		if W.check_balance() >= 500:
-			Z = Wallet(800598406149701634)
-			W.transfer(Z,-500);
-			W.set(NUM.factory,1);
-			mes = "вы теперь счастливый обладатель завода"
+		Z = Wallet(800598406149701634)
+		i = 0;
+		for i in range(104,105+1):
+			prod = product(i)
+			if prod.alias(who):
+				break
+		prod = product(i)
+		if prod.price <= W.check_balance():
+			W.transfer(Z,-prod.price)
+			W.set(i,value)
+			mes = f"вы успешно купили {prod.name}"
 		else:
 			mes = "денег нет но вы держитесь"
-	await ctx.reply(mes)
+		await ctx.reply(mes)
 
 
 @bot.command(name = "баланс",aliases=["бал","счет"])

@@ -104,18 +104,21 @@ async def heal(ctx,friend,*,reason = ""):
 
 @bot.command(name = "резня",aliases=["р"])
 async def reznya(ctx,friend,*,reason = ""):
-    try:
+    try:            
         U = UserCd(ctx.author.id);
         if U.is_cd():
             await ctx.send("кд еще " + str(U.get_cd()) + " сек")
         else:
-            target = await mute_member(ctx,friend,15)
-            stealed = steal(ctx,target,random.randint(1,15))
-            if (reason != ""):
-                mes = ctx.author.mention + " **зарезал** " + target + " по причине " + reason + '\n' + stealed; 
+            if Wallet(GetUserfromMention(friend).id).is_armor():
+                mes = "вы чувствуйте себя умиротворенным"
             else:
-                mes = ctx.author.mention + " **зарезал** " + target + '\n' + stealed; 
-            U.set_cd(5)
+                target = await mute_member(ctx,friend,15)
+                stealed = steal(ctx,target,random.randint(1,15))
+                if (reason != ""):
+                    mes = ctx.author.mention + " **зарезал** " + target + " по причине " + reason + '\n' + stealed; 
+                else:
+                    mes = ctx.author.mention + " **зарезал** " + target + '\n' + stealed; 
+            U.set_cd(10)
             await ctx.send(mes)
     except Exception as err:
         print(err)
@@ -128,15 +131,18 @@ async def shoot(ctx,friend,*,reason = ""):
         if U.is_cd():
             await ctx.send("кд еще " + str(U.get_cd()) + " сек")
         else:
-            if random.randint(0,1) == 0:
-                target = await mute_member(ctx,friend,30)
-                stealed = steal(ctx,target,random.randint(1,30))
-                if (reason != ""):
-                    mes = ctx.author.mention + " **застрелил** " + target + " по причине " + reason + '\n' + stealed; 
-                else:
-                    mes = ctx.author.mention + " **застрелил** " + target + '\n' + stealed; 
+            if Wallet(GetUserfromMention(friend).id).is_armor():
+                mes = "вы чувствуйте себя умиротворенным"
             else:
-                mes = "промахнулся, лох, кд 15 секунд"
+                if random.randint(0,1) == 0:
+                    target = await mute_member(ctx,friend,30)
+                    stealed = steal(ctx,target,random.randint(1,30))
+                    if (reason != ""):
+                        mes = ctx.author.mention + " **застрелил** " + target + " по причине " + reason + '\n' + stealed; 
+                    else:
+                        mes = ctx.author.mention + " **застрелил** " + target + '\n' + stealed; 
+                else:
+                    mes = "промахнулся, лох, кд 15 секунд"
             U.set_cd(15)
             await ctx.send(mes)
     except Exception as err:
@@ -146,17 +152,20 @@ async def shoot(ctx,friend,*,reason = ""):
 @bot.command(name = "руская_рулетка",aliases=["рр"])
 async def rr(ctx,friend,*,reason = ""):
     try:
-        if random.randint(0,1) == 0:
-            target = await mute_member(ctx,friend,60)
-            stealed = steal(ctx,target,random.randint(1,60))
+        if Wallet(GetUserfromMention(friend).id).is_armor():
+                mes = "вы чувствуйте себя умиротворенным"
         else:
-            target = await mute_member(ctx,ctx.author.id,60)
-            stealed = "";
-        if (reason != ""):
-            mes = ctx.author.mention + " **застрелил** " + target + " по причине " + reason + '\n' + stealed; 
-        else:
-            mes = ctx.author.mention + " **застрелил** " + target + '\n' + stealed; 
-        await ctx.send(mes)
+            if random.randint(0,1) == 0:
+                target = await mute_member(ctx,friend,60)
+                stealed = steal(ctx,target,random.randint(1,60))
+            else:
+                target = await mute_member(ctx,ctx.author.id,60)
+                stealed = "";
+            if (reason != ""):
+                mes = ctx.author.mention + " **застрелил** " + target + " по причине " + reason + '\n' + stealed; 
+            else:
+                mes = ctx.author.mention + " **застрелил** " + target + '\n' + stealed; 
+            await ctx.send(mes)
     except Exception as err:
         print(err)
         await ctx.send("либо нет прав нормальных, либо ты хуйню вместо аргументов указал какую-то")
@@ -168,13 +177,16 @@ async def nuke(ctx,friend,*,reason = ""):
         if U.is_cd():
             await ctx.send("кд еще " + str(U.get_cd()) + " сек")
         else:
-            target = await mute_member(ctx,friend,60*5)
-            await mute_member(ctx,ctx.author.id,60*5)
-            if (reason != ""):
-                mes = ctx.author.mention + " и " + target + " ликвидированы по причине " + reason; 
+            if Wallet(GetUserfromMention(friend).id).is_armor():
+                mes = "вы чувствуйте себя умиротворенным"
             else:
-                mes = ctx.author.mention + " и " + target + " посещают Воронеж"; 
-            U.set_cd(10)
+                target = await mute_member(ctx,friend,60*5)
+                await mute_member(ctx,ctx.author.id,60*5)
+                if (reason != ""):
+                    mes = ctx.author.mention + " и " + target + " ликвидированы по причине " + reason; 
+                else:
+                    mes = ctx.author.mention + " и " + target + " посещают Воронеж"; 
+            U.set_cd(60)
             await ctx.send(mes)
     except Exception as err:
         print(err)
