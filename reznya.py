@@ -3,9 +3,11 @@ import datetime
 import random
 import save_load
 from token_and_bot import TOKEN,bot;
-from my_funcs import GetUserfromMention,toInt
+from my_funcs import GetUserfromMention,toInt,minmax
 from discord.ext import commands;
-from bank import Wallet;
+from bank import Wallet,Num;
+
+NUM = Num()
 
 class UserCd:
     def __init__(self,_id:int):
@@ -27,10 +29,13 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.send(f"{round(error.retry_after, 2)} секунд осталось")
     else:
-        print("!!!Ошибка ебать:",error)
+        print("!!!Ошибка:",error)
 
 async def mute_member(ctx,member,duration:int)->str:
         member = GetUserfromMention(member).id
+        victim = Wallet(member)
+        thief = Wallet(ctx.author.id)
+        duration = minmax(1,duration*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.df),3600)
         print(member);
         m_member = ctx.guild.get_member(member)
         time = (datetime.timedelta(seconds=duration))
@@ -41,6 +46,7 @@ def steal(ctx,member,summa:int)->str:
     member = GetUserfromMention(member).id
     thief = Wallet(ctx.author.id);
     victim = Wallet(member);
+    summa = round(summa*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.df))
     if victim != thief:
         final_summa = thief.transfer(victim,summa)
         if final_summa > 0:
@@ -76,6 +82,7 @@ async def boom(ctx,friend,*,reason = ""):
             GOIDA.transfer(thief,50);
             if (random.randint(0,1) == 0) and (victim.check_bank()>2):
                 summa =random.randint(1,round(victim.check_bank()/3));
+                summa = round(summa*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.get(NUM.df)))
                 victim.banking(-summa);
                 thief.transfer(victim,summa);
                 await ctx.reply("вы украли из банка " + str(summa) + " 🧱")
@@ -110,7 +117,7 @@ async def reznya(ctx,friend,*,reason = ""):
             await ctx.send("кд еще " + str(U.get_cd()) + " сек")
         else:
             if Wallet(GetUserfromMention(friend).id).is_armor():
-                mes = "вы чувствуйте себя умиротворенным"
+                mes = "вы чувствуете себя умиротворенным"
             else:
                 target = await mute_member(ctx,friend,15)
                 stealed = steal(ctx,target,random.randint(1,15))
@@ -132,7 +139,7 @@ async def shoot(ctx,friend,*,reason = ""):
             await ctx.send("кд еще " + str(U.get_cd()) + " сек")
         else:
             if Wallet(GetUserfromMention(friend).id).is_armor():
-                mes = "вы чувствуйте себя умиротворенным"
+                mes = "вы чувствуете себя умиротворенным"
             else:
                 if random.randint(0,1) == 0:
                     target = await mute_member(ctx,friend,30)
@@ -153,7 +160,7 @@ async def shoot(ctx,friend,*,reason = ""):
 async def rr(ctx,friend,*,reason = ""):
     try:
         if Wallet(GetUserfromMention(friend).id).is_armor():
-                mes = "вы чувствуйте себя умиротворенным"
+                mes = "вы чувствуете себя умиротворенным"
         else:
             if random.randint(0,1) == 0:
                 target = await mute_member(ctx,friend,60)
@@ -178,7 +185,7 @@ async def nuke(ctx,friend,*,reason = ""):
             await ctx.send("кд еще " + str(U.get_cd()) + " сек")
         else:
             if Wallet(GetUserfromMention(friend).id).is_armor():
-                mes = "вы чувствуйте себя умиротворенным"
+                mes = "вы чувствуете себя умиротворенным"
             else:
                 target = await mute_member(ctx,friend,60*5)
                 await mute_member(ctx,ctx.author.id,60*5)

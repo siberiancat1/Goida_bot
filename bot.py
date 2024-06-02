@@ -83,6 +83,8 @@ async def help(ctx):
     embed.add_field(name="?баланс [@кто-нибудь]", value="выводит баланс",inline=False);
     embed.add_field(name="?банк (сумма)", value="позволяет положить или снять деньги из банка",inline=False);
     embed.add_field(name="?перевод (@кто-нибудь) [сумма] []", value="позволяет перевести деньги",inline=False);
+    embed.add_field(name="?купить [название] [кол-во]", value="позволяет купить что-нибудь или посмотреть список товаров",inline=False);
+    embed.add_field(name="?награда", value="получить награду, работает раз в 12 часов",inline=False);
 
 
     await ctx.reply(embed=embed)

@@ -1,5 +1,7 @@
 from token_and_bot import TOKEN,bot;
 import re
+def minmax(minimal,value,maximum):
+    return min(maximum,max(minimal,value))
 
 def GetUserfromMention(friend):
     try:
