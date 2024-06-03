@@ -5,7 +5,20 @@ from discord.ext import commands;
 from my_funcs import GetUserfromMention,toInt
 import random
 import datetime
+import time
 
+class UserCdDaily:
+    def __init__(self,_id:int):
+        self._id = _id
+        self.cd_time = float(save_load.read(self._id,"UserCdDaily", 0))
+        print("UserCd ",self._id,"UserCdDaily ",self.cd_time)
+    def get_cd(self)->float:
+        return (self.cd_time-time.time());
+    def set_cd(self,value:float):
+        self.cd_time = time.time() + value;
+        save_load.write(self._id,"UserCdDaily",self.cd_time)
+    def is_cd(self)->bool:
+        return (self.cd_time >= time.time());
 
 class Num:
 	def __init__(self):
@@ -111,7 +124,7 @@ class Wallet:
 		self.update()
 		who.update()
 		
-		return summa
+		return abs(summa)
 	def is_armor(self)->bool:
 		if self.get(NUM.armor)> 0:
 			self.set(NUM.armor,-1)
@@ -128,29 +141,33 @@ async def mes_reward(ctx):
 	print("вы получили " + str(summa) + " 🧱")
 
 
-@commands.cooldown(1, 12*3600, commands.BucketType.user)
 @bot.command(name = "награда",aliases=["дэйлик","завод"])
 async def daily(ctx):
-	W = Wallet(ctx.author.id)
-	summa =round(random.randint(25,250) * pow(1.1,W.get(NUM.luck)));
-	W.give(summa);
-	mes = ""
-	mes += ("вы получили " + str(summa) + "🧱 от кирпичного бога")
-	Zavod = W.get(NUM.factory)
-	if Zavod > 0:
-		summa = 0;
-		for i in range(0,Zavod):
-			summa +=round(random.randint(50,75) * pow(1.1,W.get(NUM.luck)))
-		mes += f"\nвы получили {summa}🧱 с {Zavod} заводов"
-		W.give(summa)
-	City = W.get(NUM.city)
-	if City > 0:
-		summa = 0;
-		for i in range(0,City):
-			summa +=round(random.randint(750,1125)*pow(1.1,W.get(NUM.luck)))
-		mes += f"\nвы получили {summa}🧱 с {City} городов"
-		W.give(summa)
-	await ctx.reply(mes)
+	U = UserCdDaily(ctx.author.id)
+	if U.is_cd():
+		await ctx.reply(f"кд еще {U.get_cd()} сек")
+	else:
+		W = Wallet(ctx.author.id)
+		summa =round(random.randint(25,250) * pow(1.1,W.get(NUM.luck)));
+		W.give(summa);
+		mes = ""
+		mes += ("вы получили " + str(summa) + "🧱 от кирпичного бога")
+		Zavod = W.get(NUM.factory)
+		if Zavod > 0:
+			summa = 0;
+			for i in range(0,Zavod):
+				summa +=round(random.randint(50,75) * pow(1.1,W.get(NUM.luck)))
+			mes += f"\nвы получили {summa}🧱 с {Zavod} заводов"
+			W.give(summa)
+		City = W.get(NUM.city)
+		if City > 0:
+			summa = 0;
+			for i in range(0,City):
+				summa +=round(random.randint(750,1125)*pow(1.1,W.get(NUM.luck)))
+			mes += f"\nвы получили {summa}🧱 с {City} городов"
+			W.give(summa)
+		U.set_cd(3600*8)
+		await ctx.reply(mes)
 	
 
 @bot.command(name = "перевод",aliases=["СБП","cбп","СПБ","спб"])
@@ -320,5 +337,5 @@ async def top(ctx):
 		mes +="**#" + str(count) + "**: " + str(name) + ": " + str(sorted_dict[i]) + "🧱"+ '\n';	
 	await ctx.reply(mes)
 
-W.update();
+
 print("bank.py work")

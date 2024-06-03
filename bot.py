@@ -4,6 +4,7 @@ import asyncio
 import nest_asyncio
 import re
 import datetime
+import random
 
 from discord.ext import commands;
 from discord.utils import get
@@ -20,7 +21,7 @@ import reznya
 from my_funcs import GetUserfromMention,toInt
 from info import change,gb_triger
 import bank
-import random
+import wordle
 
 nest_asyncio.apply() # в душе не ебу что за хуйня можно попробовать снести
 
@@ -85,6 +86,7 @@ async def help(ctx):
     embed.add_field(name="?перевод (@кто-нибудь) [сумма] []", value="позволяет перевести деньги",inline=False);
     embed.add_field(name="?купить [название] [кол-во]", value="позволяет купить что-нибудь или посмотреть список товаров",inline=False);
     embed.add_field(name="?награда", value="получить награду, работает раз в 12 часов",inline=False);
+    embed.add_field(name="?wordle (слово)", value="просто вордли, за правильно введенное слово вы получите 250 кирпичей, слово уникально на каждом сервере и обновляется раз в день",inline=False);
 
 
     await ctx.reply(embed=embed)
