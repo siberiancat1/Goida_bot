@@ -244,9 +244,9 @@ async def shop(ctx,who = "",value = 1):
 				return True;
 			else:
 				return False;
-
+	value = round(value)
 	mes = "ошибка"
-	if who == "":
+	if who == "" and value<1:
 		#список товаров
 		embed = discord.Embed(title="Магазин") #,color=Hex code
 		for i in range(101,106+1):
@@ -268,7 +268,7 @@ async def shop(ctx,who = "",value = 1):
 			return 0
 		prod = product(i)
 		if prod.price * value <= W.check_balance():
-			W.transfer(Z,-prod.price)
+			W.transfer(Z,-prod.price*value)
 			W.set(i,value)
 			print("W.set(i,value)",i,value)
 			print("get",W.get(i))

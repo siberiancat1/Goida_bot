@@ -29,6 +29,8 @@ class wordle:
                 self.last_date = datetime.datetime.fromtimestamp(int(save_load.read(serv,"wordle_date",0)))
                 print(self.last_date)
                 self.mes = str(save_load.read(serv,"wordle_str",""))
+        def get_mes(self):
+               return self.mes;
         def get_today_word(self): 
                 dif = datetime.datetime.now() - self.last_date
                 if dif > datetime.timedelta(days=1): 
@@ -36,12 +38,10 @@ class wordle:
                         array = self.get_array() 
                         self.today_word =array[random.randint(0,len(array)-1)]
                         t = time.mktime(self.last_date.timetuple())
-                        print(t)
                         save_load.write(self._id,"wordle_guessed", 0)
                         save_load.write(self._id,"wordle_date", t)
                         save_load.write(self._id,"wordle_str","")
                         save_load.write(self._id,"wordle",self.today_word)
-                print(self.today_word)
                 return self.today_word
         def get_array(self):
                 file1 = open("wordly.txt", "r", encoding="utf-8")
@@ -72,9 +72,9 @@ class wordle:
                                                 new = ""
                                                 for i in range(0,5):
                                                         if i in full_guessed:
-                                                                new+="**"+try_word[i]+"**";
-                                                        elif i in guessed:
                                                                 new+=try_word[i];
+                                                        elif i in guessed:
+                                                                new+=try_word[i].lower();
                                                         else:
                                                                 new+="~~"+try_word[i]+"~~";
                                                 self.mes +="\n" + new + "\n" + "угадано " + str(len(guessed)) + " из которых на своем месте " + str(len(full_guessed))
@@ -87,26 +87,33 @@ class wordle:
                                 else:
                                         return -1,"не знаю такого слова, попробуй другое"
                         else:
-                                return -1,"не знаю такого слова, попробуй другое"
+                                return -1,"длина слова 5 букв"
                         
 
 @bot.command(name = "wordle",aliases=["вордли","слово"])
-async def try_wordle(ctx,word):
-        game = wordle(0)
-        U = UserCdWordle(ctx.author.id,ctx.guild.id)
-        if U.is_cd():
-               await ctx.reply("кд еще " + str(U.get_cd))
-        else:
-                check,mes = game.attemp(word)
-                if check == -1:
-                        await ctx.reply(mes)
-                elif check == 0:
-                        await ctx.reply(mes)
-                        U.set_cd(3600)
-                elif check == 1:
-                        W = Wallet(ctx.author.id)
-                        W.give(250)
-                        await ctx.reply("Угадал, ты получил 250 🧱  и кружку пива")
-               
+async def try_wordle(ctx,word = None):
+        try:
+                game = wordle(ctx.guild.id)
+                if not (word is None):
+                        U = UserCdWordle(ctx.author.id,ctx.guild.id)
+                        if U.is_cd():
+                                await ctx.reply("кд еще " + str(U.get_cd()))
+                        else:
+                                check,mes = game.attemp(word)
+                                if check == -1:
+                                        await ctx.reply(mes)
+                                elif check == 0:
+                                        await ctx.reply(mes)
+                                        U.set_cd(1800)
+                                elif check == 1:
+                                        W = Wallet(ctx.author.id)
+                                        W.give(300)
+                                        await ctx.reply("Угадал, ты получил 300 🧱  и кружку пива")
+                else:
+                       await ctx.reply(f".{game.get_mes()}")
+        except Exception as error:
+               print(error)
+               await ctx.reply("неправильные аргументы, попробуйте: ?wordle гойда")
+                
 print("wordle.py работает")
 

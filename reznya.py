@@ -44,44 +44,39 @@ async def mute_member(ctx,member,duration:int)->str:
 
 def steal(ctx,member,summa:int)->str:
     member = GetUserfromMention(member).id
+    m_member = ctx.guild.get_member(member)
     thief = Wallet(ctx.author.id);
     victim = Wallet(member);
-    summa = round(summa*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.df))
-    if victim != thief:
-        final_summa = thief.transfer(victim,summa)
-        if final_summa > 0:
-            mes = "И украл " + str(final_summa) + " 🧱";
-        else:
-            mes = "Но ничего не украл"
+    if m_member.is_timed_out():
+        mes = "Но благородно ничего не украл"
     else:
-        mes = "";
+        summa = round(summa*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.df))
+        if victim != thief:
+            final_summa = thief.transfer(victim,summa)
+            if final_summa > 0:
+                mes = "И украл " + str(final_summa) + " 🧱";
+            else:
+                mes = "Но ничего не украл"
+        else:
+            mes = "";
     return mes;
 
 @bot.command(name = "динамит",aliases=["д"])
 async def boom(ctx,friend,*,reason = ""):
     U = UserCd(ctx.author.id);
-    print("DSkkf")
     if U.is_cd():
-        print("cd issue")
         await ctx.send("кд еще " + str(U.get_cd()) + " сек")
     else:
-        print("condtion issue")
         member = GetUserfromMention(friend).id
-        print("condtion issue")
         thief = Wallet(ctx.author.id);
-        print("condtion issue")
         victim = Wallet(member);
-        print("condtion issue")
         GOIDA = Wallet(800598406149701634);
-        print("condtion issue")
         if thief.check_balance() < 50:
             await ctx.reply("стоимость динамита 50 🧱")
-            print("money issue")
         else:
-            print("no issue")
             GOIDA.transfer(thief,50);
             if (random.randint(0,1) == 0) and (victim.check_bank()>2):
-                summa =random.randint(1,round(victim.check_bank()/3));
+                summa =random.randint(1,round(victim.check_bank()*0.4));
                 summa = round(summa*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.get(NUM.df)))
                 victim.banking(-summa);
                 thief.transfer(victim,summa);
@@ -119,8 +114,8 @@ async def reznya(ctx,friend,*,reason = ""):
             if Wallet(GetUserfromMention(friend).id).is_armor():
                 mes = "вы чувствуете себя умиротворенным"
             else:
+                stealed = steal(ctx,friend,random.randint(1,15))
                 target = await mute_member(ctx,friend,15)
-                stealed = steal(ctx,target,random.randint(1,15))
                 if (reason != ""):
                     mes = ctx.author.mention + " **зарезал** " + target + " по причине " + reason + '\n' + stealed; 
                 else:
@@ -142,8 +137,8 @@ async def shoot(ctx,friend,*,reason = ""):
                 mes = "вы чувствуете себя умиротворенным"
             else:
                 if random.randint(0,1) == 0:
+                    stealed = steal(ctx,friend,random.randint(1,30))
                     target = await mute_member(ctx,friend,30)
-                    stealed = steal(ctx,target,random.randint(1,30))
                     if (reason != ""):
                         mes = ctx.author.mention + " **застрелил** " + target + " по причине " + reason + '\n' + stealed; 
                     else:
@@ -163,8 +158,8 @@ async def rr(ctx,friend,*,reason = ""):
                 mes = "вы чувствуете себя умиротворенным"
         else:
             if random.randint(0,1) == 0:
+                stealed = steal(ctx,friend,random.randint(1,60))
                 target = await mute_member(ctx,friend,60)
-                stealed = steal(ctx,target,random.randint(1,60))
             else:
                 target = await mute_member(ctx,ctx.author.id,60)
                 stealed = "";
@@ -199,4 +194,8 @@ async def nuke(ctx,friend,*,reason = ""):
         print(err)
         await ctx.send("либо нет прав нормальных, либо ты хуйню вместо аргументов указал какую-то")
 
+@bot.command(name = "кд",aliases=["КД","кулдаун","cd","cooldown"])
+async def check_cd(ctx):
+    U = UserCd(ctx.author.id)
+    await ctx.reply(str(U.get_cd()))
 print("reznya.py work")
