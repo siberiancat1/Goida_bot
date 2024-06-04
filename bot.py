@@ -48,13 +48,12 @@ async def on_message(ctx):
             if (ctx.channel.id == need_channel.id):
                 await gb_triger(ctx);
         if random.randint(0,50) == 0:
-            await ctx.add_reaction("🧱")
             await bank.mes_reward(ctx);
     await bot.process_commands(ctx)
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(status = discord.Status.idle, activity = discord.Activity(name = "тебя ебать не должно", type = discord.ActivityType.playing)) 
+    await bot.change_presence(status = discord.Status.idle, activity = discord.Activity(name = "пригласи меня к себе пжлст <3", type = discord.ActivityType.playing)) 
     print("Bot Is Ready And Online!")
     await change()
 

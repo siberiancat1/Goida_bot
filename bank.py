@@ -133,6 +133,7 @@ class Wallet:
 			return False
 
 async def mes_reward(ctx):
+	await ctx.add_reaction("🧱")
 	W = Wallet(ctx.author.id);
 	mes_len = min(300,len(ctx.content))
 	print(mes_len)

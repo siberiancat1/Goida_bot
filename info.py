@@ -101,12 +101,15 @@ async def set_global_chat(ctx,arg):
     a = save_load.read("globalchat",serv,-1)
     await ctx.reply(a)
 
-async def Global_send(data):
+async def Global_send(ctx,data):
     array = save_load.read("has_GB","GB",[])
     for i in array:
-        need_channel = save_load.read("globalchat",i,None) # достаем id канала из файла
-        need_channel = bot.get_channel(need_channel)
-        await need_channel.send(embed=data)
+        if i!=ctx.guild.id:
+            need_channel = save_load.read("globalchat",i,None) # достаем id канала из файла
+            need_channel = bot.get_channel(need_channel)
+            await need_channel.send(embed=data)
+        else:
+            await ctx.add_reaction("🚀")
 
 async def gb_triger(ctx):
     if not (ctx.author.bot):
@@ -119,8 +122,7 @@ async def gb_triger(ctx):
         for i in ctx.attachments:
             print(i);
             embed.set_image(url=i);
-
-        await Global_send(embed)
-        await ctx.delete()
+        embed.set_footer(text=ctx.guild.name)
+        await Global_send(ctx,embed)
 
 print("info.py work")
