@@ -114,6 +114,7 @@ async def Global_send(ctx,data):
 async def gb_triger(ctx):
     if not (ctx.author.bot):
         print(ctx.content)
+        #print("answer",ctx.reference.content)
         picture = ""
 
         NEED_SEND = ctx.content

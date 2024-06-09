@@ -77,7 +77,7 @@ async def boom(ctx,friend,*,reason = ""):
             GOIDA.transfer(thief,50);
             if (random.randint(0,1) == 0) and (victim.check_bank()>2):
                 summa =random.randint(1,round(victim.check_bank()*0.4));
-                summa = round(summa*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.get(NUM.df)))
+                summa =minmax(1,round(summa*pow(1.1,thief.get(NUM.dmg))/pow(1.1,victim.get(NUM.df))),10000)
                 victim.banking(-summa);
                 thief.transfer(victim,summa);
                 await ctx.reply("вы украли из банка " + str(summa) + " 🧱")
@@ -93,7 +93,7 @@ async def heal(ctx,friend,*,reason = ""):
         if U.is_cd():
             await ctx.send("кд еще " + str(U.get_cd()) + " сек")
         else:
-            target = await mute_member(ctx,friend,1)
+            target = await mute_member(ctx,friend,0)
             if (reason != ""):
                 mes = ctx.author.mention + " **вылечил** " + target + " по причине " + reason; 
             else:

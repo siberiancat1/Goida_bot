@@ -2,9 +2,8 @@ import random
 import save_load
 import datetime
 import time
-import discord;
 from token_and_bot import TOKEN,bot; 
-from bank import Wallet
+from bank import Wallet,NUM
 
 class UserCdWordle:
     def __init__(self,_id:int,serv:int):
@@ -41,6 +40,7 @@ class wordle:
                         save_load.write(self._id,"wordle_guessed", 0)
                         save_load.write(self._id,"wordle_date", t)
                         save_load.write(self._id,"wordle_str","")
+                        self.mes = ""
                         save_load.write(self._id,"wordle",self.today_word)
                 return self.today_word
         def get_array(self):
@@ -76,7 +76,7 @@ class wordle:
                                                         elif i in guessed:
                                                                 new+=try_word[i].lower();
                                                         else:
-                                                                new+="~~"+try_word[i]+"~~";
+                                                                new+="~~"+try_word[i].lower()+"~~";
                                                 self.mes +="\n" + new + "\n" + "угадано " + str(len(guessed)) + " из которых на своем месте " + str(len(full_guessed))
                                                 save_load.write(self._id,"wordle_str",self.mes)
                                                 print(self.mes)
@@ -107,8 +107,9 @@ async def try_wordle(ctx,word = None):
                                         U.set_cd(1800)
                                 elif check == 1:
                                         W = Wallet(ctx.author.id)
-                                        W.give(300)
-                                        await ctx.reply("Угадал, ты получил 300 🧱  и кружку пива")
+                                        summa = 300 * (1 + W.get(NUM.luck)/10)
+                                        W.give(summa)
+                                        await ctx.reply(f"Угадал, ты получил {summa} 🧱  и кружку пива")
                 else:
                        await ctx.reply(f".{game.get_mes()}")
         except Exception as error:

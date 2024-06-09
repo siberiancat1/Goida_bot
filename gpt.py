@@ -2,6 +2,8 @@ import g4f.client
 import g4f
 from g4f.client import Client
 from token_and_bot import TOKEN,bot;
+from g4f.cookies import set_cookies
+
 
 gpt_memory=[] 
 def write(x:str): #память для чатХПТ
@@ -17,20 +19,23 @@ def read()->str:
     return memory;
 
 def ask_gpt(promt:str)->str:
-    client = Client(provider=g4f.Provider.DuckDuckGo) #provider=g4f.Provider.DuckDuckGo 
+    try:
+        client = Client(provider= g4f.Provider.GptTalkRu		) #provider=g4f.Provider.DuckDuckGo 
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": promt}],
+        )
+        answer = (response.choices[0].message.content)
+        return answer;
+    except:
+         return "функция временно? не работают, потому что капиталисты пидорасы."
+
+def ask_gpt4(promt:str)->str:
+    client = Client(provider=g4f.Provider.You)
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": promt}],
-    )
-    answer = (response.choices[0].message.content)
-    return answer;
-
-def ask_gpt4(promt:str)->str:
-    client = Client(provider=g4f.Provider.Bing)
-
-    response = client.chat.completions.create(
-        model=g4f.models.gpt_4,
         messages=[{"role": "user", "content": promt}],
     )
     answer = (response.choices[0].message.content)

@@ -30,8 +30,10 @@ class Num:
 		self.factory = 104
 		self.armor = 105
 		self.city = 106
-	#def array(self):
-		#return [self.balance, self.bank, self.luck, self.dmg, self.df, self.factory, self.armor]
+		self.country = 107
+		self.people = 108
+	def array(self):
+		return [self.luck, self.dmg, self.df, self.factory, self.armor,self.city,self.country,self.people]
 NUM = Num()
 
 
@@ -46,9 +48,24 @@ class Wallet:
 		self.factory = int(save_load.read(_id,"factory", 0))
 		self.armor = int(save_load.read(_id,"armor", 0))
 		self.city = int(save_load.read(_id,"city", 0))
+		self.country = int(save_load.read(_id,"country", 0))
+		self.people = int(save_load.read(_id,"people", 0))
 		print(self._id," $:",self.balance,"B:",self.bank)
 	def __str__(self):
-		return f'🧱Баланс: **{self.balance}**🧱 \n🏦Банк: **{self.bank}**🧱 \n🏭Заводов **{self.factory}** шт.\n🏙️Городов **{self.city}** шт.\n🔪**{self.dmg}** | 🛡️**{self.df}** | 🍀**{self.luck}**'
+		#return f'🧱Баланс: **{self.balance}**🧱 \n🏦Банк: **{self.bank}**🧱 \n🏭Заводов **{self.factory}** шт.\n🏙️Городов **{self.city}** шт.\n🔪**{self.dmg}** | 🛡️**{self.df}** | 🍀**{self.luck}**'
+		mes = f"🧱Баланс: **{self.balance}**🧱 \n🏦Банк: **{self.bank}**🧱"
+		if self.factory > 0:
+			mes+= f"\n🏭Заводов: **{self.factory}** шт."
+		if self.city > 0:
+			mes+= f"\n🏙️Городов: **{self.city}** шт."
+		if self.country > 0:
+			mes+= f"\n🏴Стран:  **{self.country}** шт."
+		if self.people > 0:
+			mes+= f"\n🕺~~Рабов~~ Наемных рабочих: **{self.people}** шт."
+		if self.armor > 0:
+			mes+= f"\Умиротворителей  **{self.armor}** шт."
+		mes+=f"\n🔪**{self.dmg}** | 🛡️**{self.df}** | 🍀**{self.luck}**"
+		return mes;
 	def get(self, what: int) -> int:
 		attributes = {
 			NUM.balance: self.balance,
@@ -58,7 +75,9 @@ class Wallet:
 			NUM.df: self.df,
 			NUM.factory: self.factory,
 			NUM.armor: self.armor,
-			NUM.city: self.city
+			NUM.city: self.city,
+			NUM.country: self.country,
+			NUM.people: self.people
 		}
 		print (attributes.get(what))
 		return (attributes.get(what))
@@ -80,6 +99,10 @@ class Wallet:
 			self.armor+=value
 		elif what == NUM.city:
 			self.city+=value
+		elif what == NUM.country:
+			self.country+=value
+		elif what == NUM.people:
+			self.people+=value
 		self.update()
 	def check_balance(self)->int:
 		print(self.balance)
@@ -100,6 +123,8 @@ class Wallet:
 		save_load.write(self._id,"factory",self.factory);
 		save_load.write(self._id,"armor",self.armor);
 		save_load.write(self._id,"city",self.city);
+		save_load.write(self._id,"country",self.country);
+		save_load.write(self._id,"people",self.people);
 	def banking(self, summa: int) -> int:
 		if summa > 0:
 			withdraw = min(self.balance, summa)
@@ -137,7 +162,7 @@ async def mes_reward(ctx):
 	W = Wallet(ctx.author.id);
 	mes_len = min(300,len(ctx.content))
 	print(mes_len)
-	summa = round((random.randint(1,int(mes_len)+1) )* 2 * pow(1.1,W.get(NUM.luck)))
+	summa = round(((random.randint(1,int(mes_len)+1) ) +  W.get(NUM.people)*30) * 2 * (1 + W.get(NUM.luck)/10))
 	W.give(summa);
 	print("вы получили " + str(summa) + " 🧱")
 
@@ -149,7 +174,7 @@ async def daily(ctx):
 		await ctx.reply(f"кд еще {U.get_cd()} сек")
 	else:
 		W = Wallet(ctx.author.id)
-		summa =round(random.randint(25,250) * pow(1.1,W.get(NUM.luck)));
+		summa = round(random.randint(25,250) * (1 + W.get(NUM.luck)/10) );
 		W.give(summa);
 		mes = ""
 		mes += ("вы получили " + str(summa) + "🧱 от кирпичного бога")
@@ -157,14 +182,21 @@ async def daily(ctx):
 		if Zavod > 0:
 			summa = 0;
 			for i in range(0,Zavod):
-				summa +=round(random.randint(50,75) * pow(1.1,W.get(NUM.luck)))
+				summa +=round(random.randint(50,75) * (1 + W.get(NUM.luck)/10) )
 			mes += f"\nвы получили {summa}🧱 с {Zavod} заводов"
 			W.give(summa)
 		City = W.get(NUM.city)
 		if City > 0:
 			summa = 0;
 			for i in range(0,City):
-				summa +=round(random.randint(750,1125)*pow(1.1,W.get(NUM.luck)))
+				summa +=round(random.randint(750,1125)*(1 + W.get(NUM.luck)/10))
+			mes += f"\nвы получили {summa}🧱 с {City} городов"
+			W.give(summa)
+		Country = W.get(NUM.country)
+		if Country > 0:
+			summa = 0;
+			for i in range(0,City):
+				summa +=round(random.randint(11250,16875)*(1 + W.get(NUM.luck)/10))
 			mes += f"\nвы получили {summa}🧱 с {City} городов"
 			W.give(summa)
 		U.set_cd(3600*8)
@@ -197,10 +229,11 @@ async def trans(ctx,member,summa = 1,*,reason = ''):
 			await m_member.timeout(time, reason="пидор")
 		await ctx.reply(mes);
 	except Exception as ER:
+		await ctx.reply("ошибка 2904214920-493054935045ш83-05940")
 		print(ER)
 
 @bot.command(name = "купить",aliases=["покупка","магазин"])
-async def shop(ctx,who = "",value = 1):
+async def shop(ctx,who = None,value = 1):
 	class product:
 		def __init__(self,what) -> None:
 			self._id = what
@@ -210,7 +243,7 @@ async def shop(ctx,who = "",value = 1):
 				self.disc = "Позволяет получать ежедневную награду"
 				self.aliases = ["завод","кирпичный","з",4]
 			elif what == NUM.luck:
-				self.price = 300
+				self.price = 500
 				self.name = "Чипсы"
 				self.disc = "Очень вкусные чипсы лейс с крабом. Повышает удачу."
 				self.aliases = ["чипсы","ч","Чипсы",1]
@@ -218,12 +251,12 @@ async def shop(ctx,who = "",value = 1):
 				self.price = 275
 				self.name = "Урон"
 				self.disc = "Не придумал смешное название(((((. Повышает время мута и кол-во денег которое вы можете украсть"
-				self.aliases = ["Урон","Dmg","урон",2]
+				self.aliases = ["dmg","урон",2]
 			elif what == NUM.df:
 				self.price = 325
 				self.name = "ПВО"
 				self.disc = "повышает защиту, уменьшает время мута и кол-во денег которое можно украсть у вас"
-				self.aliases = ["ПВО","пво","защита","def",3]
+				self.aliases = ["пво","защита","def",3]
 			elif what == NUM.armor:
 				self.price = 100
 				self.name = "Умиротворятель"
@@ -234,23 +267,35 @@ async def shop(ctx,who = "",value = 1):
 				self.name = "Город"
 				self.disc = "Счастье анкапа, приности в 15 раз больше денег чем завод"
 				self.aliases = ["город","city",6]
+			elif what == NUM.country:
+				self.price = 75000
+				self.name = "Страна"
+				self.disc = "Счастье анкапа, приности в 15 раз больше денег чем город"
+				self.aliases = ["с","страна",7]
+			elif what == NUM.people:
+				self.price = 500
+				self.name = "Люди"
+				self.disc = "Увеличивают награду за сообщения на 60 кирпичей, что ты выберишь людей или чипсы?"
+				self.aliases = ["люди","черные","дети",8]
 			else:
 				self.price = 9999999;
 				self.aliases = [];
 				self.name = ""
 				self.disc = "если вы читаете это что-то работает неправильно"
 
-		def alias(self,req)->bool:
-			if req in self.aliases or req == self.name:
+		def alias(self,req:str)->bool:
+			req = req.lower() 
+			if (req  in self.aliases) or (req == self.name):
 				return True;
 			else:
 				return False;
+	
 	value = round(value)
 	mes = "ошибка"
-	if who == "" and value<1:
+	if who is None:
 		#список товаров
 		embed = discord.Embed(title="Магазин") #,color=Hex code
-		for i in range(101,106+1):
+		for i in NUM.array():
 			num = i - 100
 			prod = product(i)
 			embed.add_field(name=f"#{num}. {prod.name} {prod.price} 🧱", value=prod.disc, inline=False)
@@ -260,7 +305,7 @@ async def shop(ctx,who = "",value = 1):
 		W = Wallet(ctx.author.id)
 		Z = Wallet(800598406149701634)
 		i = 0
-		for i in range(101,106+1):
+		for i in NUM.array():
 			prod = product(i)
 			if prod.alias(who):
 				break
@@ -268,7 +313,7 @@ async def shop(ctx,who = "",value = 1):
 			await ctx.reply("товар не найден")
 			return 0
 		prod = product(i)
-		if prod.price * value <= W.check_balance():
+		if (prod.price * value <= W.check_balance()) and value>0:
 			W.transfer(Z,-prod.price*value)
 			W.set(i,value)
 			print("W.set(i,value)",i,value)
@@ -337,6 +382,5 @@ async def top(ctx):
 		name = i.display_name
 		mes +="**#" + str(count) + "**: " + str(name) + ": " + str(sorted_dict[i]) + "🧱"+ '\n';	
 	await ctx.reply(mes)
-
 
 print("bank.py work")

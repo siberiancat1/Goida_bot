@@ -77,15 +77,15 @@ async def help(ctx):
     embed.add_field(name="?резня (@кто-нибудь) []", value="выдает мут на 15 сек, кд 5 сек",inline=False);
     embed.add_field(name="?пистолет (@кто-нибудь) []", value="выдает мут на 30 сек с 50% шансом, кд 15 сек",inline=False);
     embed.add_field(name="?рр (@кто-нибудь) []", value="выдает мут на 60 сек с 50% шансом, может выдать мут вам",inline=False);
-    embed.add_field(name="?динамит (@кто-нибудь)", value="позволяет взорвать банк  ||и (взять до 33% оттуда)|| или себе жопу",inline=False);
+    embed.add_field(name="?динамит (@кто-нибудь)", value="позволяет взорвать банк  ||и (взять до 40% оттуда)|| или себе жопу",inline=False);
     embed.add_field(name="?атомная_бомба (@кто-нибудь) []", value="выдает мут на 5 минут",inline=False);
     embed.add_field(name="?хил (@кто-нибудь) []", value="снимает мут",inline=False);
     embed.add_field(name="?баланс [@кто-нибудь]", value="выводит баланс",inline=False);
     embed.add_field(name="?банк (сумма)", value="позволяет положить или снять деньги из банка",inline=False);
     embed.add_field(name="?перевод (@кто-нибудь) [сумма] []", value="позволяет перевести деньги",inline=False);
     embed.add_field(name="?купить [название] [кол-во]", value="позволяет купить что-нибудь или посмотреть список товаров",inline=False);
-    embed.add_field(name="?награда", value="получить награду, работает раз в 12 часов",inline=False);
-    embed.add_field(name="?wordle (слово)", value="просто вордли, за правильно введенное слово вы получите 250 кирпичей, слово уникально на каждом сервере и обновляется раз в день",inline=False);
+    embed.add_field(name="?награда", value="получить награду, работает раз в 8 часов",inline=False);
+    embed.add_field(name="?wordle (слово)", value="просто вордли, за правильно введенное слово вы получите 300 кирпичей, слово уникально на каждом сервере и обновляется раз в день",inline=False);
 
 
     await ctx.reply(embed=embed)
