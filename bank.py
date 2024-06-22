@@ -7,6 +7,8 @@ import random
 import datetime
 import time
 
+VALUTE = "🧱"
+
 class UserCdDaily:
     def __init__(self,_id:int):
         self._id = _id
@@ -53,7 +55,7 @@ class Wallet:
 		print(self._id," $:",self.balance,"B:",self.bank)
 	def __str__(self):
 		#return f'🧱Баланс: **{self.balance}**🧱 \n🏦Банк: **{self.bank}**🧱 \n🏭Заводов **{self.factory}** шт.\n🏙️Городов **{self.city}** шт.\n🔪**{self.dmg}** | 🛡️**{self.df}** | 🍀**{self.luck}**'
-		mes = f"🧱Баланс: **{self.balance}**🧱 \n🏦Банк: **{self.bank}**🧱"
+		mes = f"{VALUTE}Баланс: **{self.balance}**{VALUTE} \n🏦Банк: **{self.bank}**{VALUTE}"
 		if self.factory > 0:
 			mes+= f"\n🏭Заводов: **{self.factory}** шт."
 		if self.city > 0:
@@ -63,7 +65,7 @@ class Wallet:
 		if self.people > 0:
 			mes+= f"\n🕺~~Рабов~~ Наемных рабочих: **{self.people}** шт."
 		if self.armor > 0:
-			mes+= f"\Умиротворителей  **{self.armor}** шт."
+			mes+= f"\n🧻Умиротворителей  **{self.armor}** шт."
 		mes+=f"\n🔪**{self.dmg}** | 🛡️**{self.df}** | 🍀**{self.luck}**"
 		return mes;
 	def get(self, what: int) -> int:
@@ -79,9 +81,19 @@ class Wallet:
 			NUM.country: self.country,
 			NUM.people: self.people
 		}
-		print (attributes.get(what))
+		print ("atr",attributes.get(what))
 		return (attributes.get(what))
-
+	def reset(self):
+		self.bank = 0
+		self.balance = 0
+		self.luck = 0
+		self.dmg = 0
+		self.df = 0
+		self.factory = 0
+		self.armor = 0
+		self.city = 0
+		self.country = 0
+		self.people = 0
 	def set(self, what: int, value: int):
 		if what == NUM.balance:
 			self.balance+= value
@@ -105,10 +117,10 @@ class Wallet:
 			self.people+=value
 		self.update()
 	def check_balance(self)->int:
-		print(self.balance)
+		print("self.balance",self.balance)
 		return self.balance;
 	def check_bank(self)->int:
-		print(self.bank)
+		print("self.bank",self.bank)
 		return self.bank;
 	def give(self,summa:int)->int:
 		self.balance += summa;
@@ -156,15 +168,24 @@ class Wallet:
 			return True
 		else:
 			return False
+	def get_price(self,what:int,price:int,value:int = 1)->int:
+		now_value = self.get(what)
+		summa = 0
+		for i in range(0,value):
+			summa += price * pow(1.25,now_value)
+			now_value += 1
+			print(summa,now_value)
+		return round(summa)
+		
+
 
 async def mes_reward(ctx):
-	await ctx.add_reaction("🧱")
+	await ctx.add_reaction({VALUTE})
 	W = Wallet(ctx.author.id);
 	mes_len = min(300,len(ctx.content))
-	print(mes_len)
-	summa = round(((random.randint(1,int(mes_len)+1) ) +  W.get(NUM.people)*30) * 2 * (1 + W.get(NUM.luck)/10))
+	summa = round(((random.randint(1,int((mes_len)+1) * (1 + W.get(NUM.luck)/20)) ) +  W.get(NUM.people)*30) * 2)
 	W.give(summa);
-	print("вы получили " + str(summa) + " 🧱")
+	print(f"вы получили {summa} {VALUTE}")
 
 
 @bot.command(name = "награда",aliases=["дэйлик","завод"])
@@ -174,30 +195,31 @@ async def daily(ctx):
 		await ctx.reply(f"кд еще {U.get_cd()} сек")
 	else:
 		W = Wallet(ctx.author.id)
-		summa = round(random.randint(25,250) * (1 + W.get(NUM.luck)/10) );
+		summa = round(random.randint(100,500 * (1 + W.get(NUM.luck)/25)));
 		W.give(summa);
 		mes = ""
-		mes += ("вы получили " + str(summa) + "🧱 от кирпичного бога")
+		mes += ("вы получили " + str(summa) + f"{VALUTE} от кирпичного бога")
 		Zavod = W.get(NUM.factory)
+		i = 0
 		if Zavod > 0:
 			summa = 0;
-			for i in range(0,Zavod):
-				summa +=round(random.randint(50,75) * (1 + W.get(NUM.luck)/10) )
-			mes += f"\nвы получили {summa}🧱 с {Zavod} заводов"
+			for i in range(0,min(1024,Zavod)):
+				summa +=round(random.randint(75,100 * (1 + W.get(NUM.luck)/25)) )
+			mes += f"\nвы получили {summa}{VALUTE} с {i+1} заводов"
 			W.give(summa)
 		City = W.get(NUM.city)
 		if City > 0:
 			summa = 0;
-			for i in range(0,City):
-				summa +=round(random.randint(750,1125)*(1 + W.get(NUM.luck)/10))
-			mes += f"\nвы получили {summa}🧱 с {City} городов"
+			for i in range(0,min(1024,City)):
+				summa +=round(random.randint(1125,1500*(1 + W.get(NUM.luck)/25)))
+			mes += f"\nвы получили {summa}{VALUTE} с {i+1} городов"
 			W.give(summa)
 		Country = W.get(NUM.country)
 		if Country > 0:
 			summa = 0;
-			for i in range(0,City):
-				summa +=round(random.randint(11250,16875)*(1 + W.get(NUM.luck)/10))
-			mes += f"\nвы получили {summa}🧱 с {City} городов"
+			for i in range(0,min(1024,Country)):
+				summa +=round(random.randint(16875,22500 * (1 + W.get(NUM.luck)/20)))
+			mes += f"\nвы получили {summa}{VALUTE} с {i+1} стран"
 			W.give(summa)
 		U.set_cd(3600*8)
 		await ctx.reply(mes)
@@ -205,7 +227,6 @@ async def daily(ctx):
 
 @bot.command(name = "перевод",aliases=["СБП","cбп","СПБ","спб"])
 async def trans(ctx,member,summa = 1,*,reason = ''):
-
 	try:
 		print('skwasfkfffd')
 		Umember = GetUserfromMention(member).id;
@@ -218,7 +239,7 @@ async def trans(ctx,member,summa = 1,*,reason = ''):
 			summa *= -1;
 			final_summa = thief.transfer(victim,summa)
 			if final_summa > 0:
-				mes = "Вы перевели " + str(final_summa) + " 🧱 пользователю " + str(member) + " " + reason;
+				mes = "Вы перевели " + str(final_summa) + f" {VALUTE} пользователю " + str(member) + " " + reason;
 			else:
 				mes = "Денег нет, но вы держитесь"
 		else:
@@ -271,12 +292,12 @@ async def shop(ctx,who = None,value = 1):
 				self.price = 75000
 				self.name = "Страна"
 				self.disc = "Счастье анкапа, приности в 15 раз больше денег чем город"
-				self.aliases = ["с","страна",7]
+				self.aliases = ["с","страна","стран","городов",7]
 			elif what == NUM.people:
 				self.price = 500
 				self.name = "Люди"
 				self.disc = "Увеличивают награду за сообщения на 60 кирпичей, что ты выберишь людей или чипсы?"
-				self.aliases = ["люди","черные","дети",8]
+				self.aliases = ["люди","людей","детей","черные","дети",8]
 			else:
 				self.price = 9999999;
 				self.aliases = [];
@@ -294,40 +315,45 @@ async def shop(ctx,who = None,value = 1):
 	mes = "ошибка"
 	if who is None:
 		#список товаров
-		embed = discord.Embed(title="Магазин") #,color=Hex code
+		W = Wallet(ctx.author.id)
+		embed = discord.Embed(title="Магазин")
 		for i in NUM.array():
 			num = i - 100
 			prod = product(i)
-			embed.add_field(name=f"#{num}. {prod.name} {prod.price} 🧱", value=prod.disc, inline=False)
+			embed.add_field(name=f"#{num}. {prod.name} {W.get_price(i,prod.price)} {VALUTE} ({prod.price} {VALUTE})", value=prod.disc, inline=False)
 		await ctx.reply(embed=embed)
 	else:
 		#собственно покупка
-		W = Wallet(ctx.author.id)
-		Z = Wallet(800598406149701634)
-		i = 0
-		for i in NUM.array():
+		if False:
+			mes = "в магазине нихуя нет"
+		else:
+			W = Wallet(ctx.author.id)
+			Z = Wallet(800598406149701634)
+			i = 0
+			for i in NUM.array():
+				prod = product(i)
+				if prod.alias(who):
+					break
+			else:
+				await ctx.reply("товар не найден")
+				return 0
 			prod = product(i)
-			if prod.alias(who):
-				break
-		else:
-			await ctx.reply("товар не найден")
-			return 0
-		prod = product(i)
-		if (prod.price * value <= W.check_balance()) and value>0:
-			W.transfer(Z,-prod.price*value)
-			W.set(i,value)
-			print("W.set(i,value)",i,value)
-			print("get",W.get(i))
-			mes = f"вы успешно купили {prod.name}"
-		else:
-			mes = "денег нет но вы держитесь"
+			price = W.get_price(i,prod.price,value)
+			if (price <= W.check_balance()) and value>0:
+				W.transfer(Z,-prod.price)
+				W.set(i,value)
+				print("W.set(i,value)",i,value)
+				print("get",W.get(i))
+				mes = f"вы успешно купили {prod.name} в кол-ве {value} за {price} {VALUTE}"
+			else:
+				mes = f"для вас {prod.name} в кол-ве {value} будет стоить {price} {VALUTE}"
 		await ctx.reply(mes)
 
 
 @bot.command(name = "баланс",aliases=["бал","счет"])
 async def my_bal(ctx,who = None):
 	try:
-		i = 0;
+		i = 0
 		mes = ""
 		print("баланс воркинг")
 		if who == None:
@@ -335,7 +361,7 @@ async def my_bal(ctx,who = None):
 			User = ctx.author.mention;
 		else:
 			i = Wallet(GetUserfromMention(who).id);
-			User = who;
+			User = who
 		mes = "**Баланс пользователя** " + User + ":" + '\n' + str(i)
 		await ctx.reply(mes)
 	except:
@@ -345,22 +371,26 @@ async def my_bal(ctx,who = None):
 
 @bot.command(name = "банк",aliases=["вклад","вывод"])
 async def bank(ctx,summa = "все"):
-	print("bank")
-	W = Wallet(ctx.author.id)
-	if summa == "все":
-		summa = W.check_balance();
-	try:
-		summa = int(summa)
-		print("bank2")
-		final_summa = W.banking(summa)
-		if summa>0:
-			mes = "вы положили " + str(final_summa) + " 🧱 в банк" 
-		else:
-			mes = "вы сняли " + str(final_summa) + " 🧱" 
-		await ctx.reply(mes);
-	except Exception as err:
-		print(err)
-		await ctx.reply("сумма должна быть целым числом")
+	now = datetime.datetime.now()  
+	if datetime.datetime.weekday(now)!=6:
+		print("bank")
+		W = Wallet(ctx.author.id)
+		if summa == "все":
+			summa = W.check_balance();
+		try:
+			summa = int(summa)
+			print("bank2")
+			final_summa = W.banking(summa)
+			if summa>0:
+				mes = "вы положили " + str(final_summa) + " {VALUTE} в банк" 
+			else:
+				mes = "вы сняли " + str(final_summa) + " {VALUTE}" 
+			await ctx.reply(mes);
+		except Exception as err:
+			print(err)
+			await ctx.reply("сумма должна быть целым числом")
+	else:
+		ctx.reply("у банков в воскресенье выходной")
 
 
 @bot.command(name ="топ", aliases=["лидеры","Топ","ТОП","Лидеры"]) 
@@ -371,7 +401,7 @@ async def top(ctx):
 	my_dict = {}
 	for member in guild.members:
 		W = Wallet(member.id)
-		if not (W.check_balance() == 1 and W.check_bank() == 100) and not (member.id == 800598406149701634):
+		if (W.check_balance() + W.check_bank() > 1) and not (member.id == 800598406149701634):
 			value = W.check_balance() + W.check_bank() + 750*W.get(NUM.factory);
 			user = member;
 			my_dict[user] = value;
@@ -380,7 +410,32 @@ async def top(ctx):
 	for i in sorted_dict:
 		count+=1
 		name = i.display_name
-		mes +="**#" + str(count) + "**: " + str(name) + ": " + str(sorted_dict[i]) + "🧱"+ '\n';	
+		mes +="**#" + str(count) + "**: " + str(name) + ": " + str(sorted_dict[i]) + + f" {VALUTE}" + '\n';	
 	await ctx.reply(mes)
+
+
+@bot.command(name ="пиздецблять") 
+async def a_reset(ctx): 
+	if ctx.author.id == 587657831285522529:
+		await ctx.send("ok")
+		guild = ctx.message.guild
+		mes = "**КИРПИЧНЫЕ БАНКРОТЫ:**" + '\n'
+		my_dict = {}
+		for member in guild.members:
+			W = Wallet(member.id)
+			W.reset()
+			W.update()
+			if not (W.check_balance() == 1 and W.check_bank() == 100) and not (member.id == 800598406149701634):
+				value = W.check_balance() + W.check_bank() + 750*W.get(NUM.factory);
+				user = member;
+				my_dict[user] = value;
+		sorted_dict = dict(sorted(my_dict.items(), key=lambda item: item[1],reverse=True))
+		count = 0
+		for i in sorted_dict:
+			count+=1
+			name = i.display_name
+			mes +="**#" + str(count) + "**: " + str(name) + ": " + str(sorted_dict[i]) + f" {VALUTE}"+ '\n';	
+		await ctx.reply(mes)
+
 
 print("bank.py work")

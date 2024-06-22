@@ -26,13 +26,14 @@ class wordle:
                 self.today_word = str(save_load.read(serv,"wordle",None))
                 self.today_word_guessed = save_load.read(serv,"wordle_guessed",0)
                 self.last_date = datetime.datetime.fromtimestamp(int(save_load.read(serv,"wordle_date",0)))
-                print(self.last_date)
-                self.mes = str(save_load.read(serv,"wordle_str",""))
+                self.mes = str(save_load.read(serv,"wordle_str","**WORDLE**" + '\n'))
+                self.today_word = self.get_today_word()
         def get_mes(self):
                return self.mes;
         def get_today_word(self): 
                 dif = datetime.datetime.now() - self.last_date
-                if dif > datetime.timedelta(days=1): 
+                if dif >= datetime.timedelta(days=1):
+                        
                         self.last_date = datetime.datetime.now()
                         array = self.get_array() 
                         self.today_word =array[random.randint(0,len(array)-1)]
@@ -42,6 +43,7 @@ class wordle:
                         save_load.write(self._id,"wordle_str","")
                         self.mes = ""
                         save_load.write(self._id,"wordle",self.today_word)
+                print(self.today_word)
                 return self.today_word
         def get_array(self):
                 file1 = open("wordly.txt", "r", encoding="utf-8")
@@ -53,9 +55,9 @@ class wordle:
                 array = [line.rstrip() for line in array]
                 return array
         def attemp(self,try_word):
-                self.get_today_word()
                 if self.today_word_guessed == 1:
-                        return -1,"На этом сервере слово уже угадано"
+                        dif = datetime.timedelta(days=1) - (datetime.datetime.now() - self.last_date)
+                        return -1, f"На этом сервере слово уже угадано,следующее через {dif}"
                 else:
                         full_guessed=[]
                         guessed=[]
@@ -82,9 +84,12 @@ class wordle:
                                                 print(self.mes)
                                                 return 0,self.mes
                                         else:
+                                                self.mes+="\n" + f"слово угадано - {self.today_word}"
+                                                save_load.write(self._id,"wordle_str",self.mes)
                                                 save_load.write(self._id,"wordle_guessed",1)
                                                 return 1,self.mes
                                 else:
+
                                         return -1,"не знаю такого слова, попробуй другое"
                         else:
                                 return -1,"длина слова 5 букв"
@@ -107,7 +112,7 @@ async def try_wordle(ctx,word = None):
                                         U.set_cd(1800)
                                 elif check == 1:
                                         W = Wallet(ctx.author.id)
-                                        summa = 300 * (1 + W.get(NUM.luck)/10)
+                                        summa = round(300 * (1 + W.get(NUM.luck)/20))
                                         W.give(summa)
                                         await ctx.reply(f"Угадал, ты получил {summa} 🧱  и кружку пива")
                 else:
