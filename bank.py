@@ -195,7 +195,7 @@ async def daily(ctx):
 		await ctx.reply(f"кд еще {U.get_cd()} сек")
 	else:
 		W = Wallet(ctx.author.id)
-		summa = round(random.randint(100,500 * (1 + W.get(NUM.luck)/25)));
+		summa = round(random.uniform(100,500 * (1 + W.get(NUM.luck)/25)));
 		W.give(summa);
 		mes = ""
 		mes += ("вы получили " + str(summa) + f"{VALUTE} от кирпичного бога")
@@ -204,21 +204,21 @@ async def daily(ctx):
 		if Zavod > 0:
 			summa = 0;
 			for i in range(0,min(1024,Zavod)):
-				summa +=round(random.randint(75,100 * (1 + W.get(NUM.luck)/25)) )
+				summa +=round(random.uniform(75,100 * (1 + W.get(NUM.luck)/25)) )
 			mes += f"\nвы получили {summa}{VALUTE} с {i+1} заводов"
 			W.give(summa)
 		City = W.get(NUM.city)
 		if City > 0:
 			summa = 0;
 			for i in range(0,min(1024,City)):
-				summa +=round(random.randint(1125,1500*(1 + W.get(NUM.luck)/25)))
+				summa +=round(random.uniform(1125,1500*(1 + W.get(NUM.luck)/25)))
 			mes += f"\nвы получили {summa}{VALUTE} с {i+1} городов"
 			W.give(summa)
 		Country = W.get(NUM.country)
 		if Country > 0:
 			summa = 0;
 			for i in range(0,min(1024,Country)):
-				summa +=round(random.randint(16875,22500 * (1 + W.get(NUM.luck)/20)))
+				summa +=round(random.uniform(16875,22500 * (1 + W.get(NUM.luck)/20)))
 			mes += f"\nвы получили {summa}{VALUTE} с {i+1} стран"
 			W.give(summa)
 		U.set_cd(3600*8)
@@ -382,9 +382,9 @@ async def bank(ctx,summa = "все"):
 			print("bank2")
 			final_summa = W.banking(summa)
 			if summa>0:
-				mes = "вы положили " + str(final_summa) + " {VALUTE} в банк" 
+				mes = "вы положили " + str(final_summa) + f" {VALUTE} в банк" 
 			else:
-				mes = "вы сняли " + str(final_summa) + " {VALUTE}" 
+				mes = "вы сняли " + str(final_summa) + f" {VALUTE}" 
 			await ctx.reply(mes);
 		except Exception as err:
 			print(err)
